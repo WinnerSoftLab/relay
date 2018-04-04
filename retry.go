@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/armon/relay/broker"
+	"github.com/WinnerSoftLab/relay/broker"
 )
 
 var (

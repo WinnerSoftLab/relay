@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/armon/relay/broker"
+	"github.com/WinnerSoftLab/relay/broker"
 	"github.com/streadway/amqp"
 )
 
@@ -28,6 +28,7 @@ type Config struct {
 	Serializer            Serializer    // Defaults to GOBSerializer
 	MessageTTL            time.Duration // Optional, attempts to put a TTL on message life
 	QueueTTL              time.Duration // Optional, attempts to make a TTL on a queue life
+	WithoutPrefix         bool          // by default "relay." prefix will be used for legacy support
 }
 
 type Relay struct {
@@ -280,7 +281,7 @@ func (r *Relay) ConsumerWithRoutingKey(queue string, routingKey string) (*Consum
 	}()
 
 	// Ensure the queue exists
-	name := queueName(queue)
+	name := queueName(queue, r.conf.WithoutPrefix)
 	if err := r.declareQueue(ch, name, routingKey); err != nil {
 		return nil, err
 	}
@@ -334,7 +335,7 @@ func (r *Relay) PublisherWithRoutingKey(queue string, routingKey string) (*Publi
 	}()
 
 	// Ensure the queue exists
-	name := queueName(queue)
+	name := queueName(queue, r.conf.WithoutPrefix)
 	if err := r.declareQueue(ch, name, routingKey); err != nil {
 		return nil, err
 	}

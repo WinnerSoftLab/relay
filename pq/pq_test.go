@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/armon/relay/inmem"
+	"github.com/WinnerSoftLab/relay/inmem"
 )
 
 func TestPriorityQueue(t *testing.T) {
