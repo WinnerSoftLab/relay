@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/armon/relay/broker"
+	"github.com/WinnerSoftLab/relay/broker"
 	"github.com/hashicorp/go-uuid"
 )
 

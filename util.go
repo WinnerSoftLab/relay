@@ -9,9 +9,9 @@ import (
 )
 
 // Converts the user input name into the actual name
-func queueName(name string) string {
+func queueName(name string, withoutPrefix bool) string {
 	// Allow using a nameless queue
-	if name == "" {
+	if name == "" || withoutPrefix {
 		return name
 	}
 

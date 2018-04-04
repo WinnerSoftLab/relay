@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/armon/relay"
-	"github.com/armon/relay/broker"
+	"github.com/WinnerSoftLab/relay"
+	"github.com/WinnerSoftLab/relay/broker"
 )
 
 // InmemBroker implements the Broker interface in-memory

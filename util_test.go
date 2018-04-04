@@ -5,10 +5,13 @@ import (
 )
 
 func TestQueueName(t *testing.T) {
-	if name := queueName("test"); name != "relay.test" {
+	if name := queueName("test", false); name != "relay.test" {
 		t.Fatalf("bad queue name: %q", name)
 	}
-	if name := queueName(""); name != "" {
+	if name := queueName("", false); name != "" {
+		t.Fatalf("bad queue name: %q", name)
+	}
+	if name := queueName("test", true); name != "test" {
 		t.Fatalf("bad queue name: %q", name)
 	}
 }
