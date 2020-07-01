@@ -8,6 +8,7 @@ type Broker interface {
 	Close() error
 	Consumer(queue string) (Consumer, error)
 	Publisher(queue string) (Publisher, error)
+	PublisherWithRoutingKey(queue string, routingKey string) (Publisher, error)
 }
 
 // Publisher is used to push messages into a queue
