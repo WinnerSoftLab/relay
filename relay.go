@@ -6,8 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/WinnerSoftLab/relay/broker"
 	"github.com/streadway/amqp"
+
+	"github.com/WinnerSoftLab/relay/broker"
 )
 
 // Config is passed into New when creating a Relay to tune
@@ -334,10 +335,12 @@ func (r *Relay) PublisherWithRoutingKey(queue string, routingKey string) (*Publi
 		}
 	}()
 
-	// Ensure the queue exists
 	name := queueName(queue, r.conf.WithoutPrefix)
-	if err := r.declareQueue(ch, name, routingKey); err != nil {
-		return nil, err
+	if queue != "" { // do not create exclusive queue for publisher w/o consumers
+		// Ensure the queue exists
+		if err := r.declareQueue(ch, name, routingKey); err != nil {
+			return nil, err
+		}
 	}
 
 	// Determine content type
@@ -388,6 +391,10 @@ func (r *relayBroker) Close() error {
 
 func (r *relayBroker) Publisher(q string) (broker.Publisher, error) {
 	return r.relay.Publisher(q)
+}
+
+func (r *relayBroker) PublisherWithRoutingKey(queue string, routingKey string) (broker.Publisher, error) {
+	return r.relay.PublisherWithRoutingKey(queue, routingKey)
 }
 
 func (r *relayBroker) Consumer(q string) (broker.Consumer, error) {

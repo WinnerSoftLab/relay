@@ -50,12 +50,18 @@ func (r *Relay) RetryBroker(attempts int, min, max time.Duration) (*retryBroker,
 
 // Publisher returns a new retrying broker.Publisher.
 func (rb *retryBroker) Publisher(queue string) (broker.Publisher, error) {
+	return rb.PublisherWithRoutingKey(queue, queue) //keep legacy behaviour
+}
+
+// Publisher returns a new retrying broker.Publisher.
+func (rb *retryBroker) PublisherWithRoutingKey(queue string, routingKey string) (broker.Publisher, error) {
 	return &retryPublisher{
-		broker:   rb.broker,
-		queue:    queue,
-		attempts: rb.attempts,
-		min:      rb.min,
-		max:      rb.max,
+		broker:     rb.broker,
+		queue:      queue,
+		routingKey: routingKey,
+		attempts:   rb.attempts,
+		min:        rb.min,
+		max:        rb.max,
 	}, nil
 }
 
@@ -246,13 +252,14 @@ func (rc *retryConsumer) ConsumeTimeout(out interface{}, timeout time.Duration) 
 // the underlying publisher's channel to be automatically swapped out if any
 // errors are seen during a publish.
 type retryPublisher struct {
-	broker   broker.Broker
-	pub      broker.Publisher
-	queue    string
-	attempts int
-	min      time.Duration
-	max      time.Duration
-	l        sync.RWMutex
+	broker     broker.Broker
+	pub        broker.Publisher
+	queue      string
+	routingKey string
+	attempts   int
+	min        time.Duration
+	max        time.Duration
+	l          sync.RWMutex
 }
 
 // publisher is used to connect the publisher to the relay queue.
@@ -270,7 +277,7 @@ func (rp *retryPublisher) publisher(create bool) (broker.Publisher, error) {
 	rp.l.Lock()
 	defer rp.l.Unlock()
 
-	pub, err := rp.broker.Publisher(rp.queue)
+	pub, err := rp.broker.PublisherWithRoutingKey(rp.queue, rp.routingKey)
 	if err != nil {
 		return nil, err
 	}
