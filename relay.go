@@ -30,6 +30,7 @@ type Config struct {
 	MessageTTL            time.Duration // Optional, attempts to put a TTL on message life
 	QueueTTL              time.Duration // Optional, attempts to make a TTL on a queue life
 	WithoutPrefix         bool          // by default "relay." prefix will be used for legacy support
+	AutoDelete            bool          // Optional, delete queue for after disconnect, always works for unnamed queues
 }
 
 type Relay struct {
@@ -213,10 +214,15 @@ func (r *Relay) declareQueue(ch *amqp.Channel, name string, routingKey string) e
 	}
 
 	// Automatically use an exclusive queue if an empty name is provided.
-	exclusive := name == ""
+	var exclusive bool
+	autoDelete := r.conf.AutoDelete
+	if name == "" {
+		exclusive = true
+		autoDelete = true
+	}
 
 	// Declare the queue
-	if _, err := ch.QueueDeclare(name, true, exclusive, exclusive, false, args); err != nil {
+	if _, err := ch.QueueDeclare(name, true, autoDelete, exclusive, false, args); err != nil {
 		return fmt.Errorf("Failed to declare queue '%s'! Got: %s", name, err)
 	}
 
