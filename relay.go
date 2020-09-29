@@ -195,7 +195,8 @@ func (r *Relay) getChan(conn **amqp.Connection) (*amqp.Channel, error) {
 
 	// Declare an exchange if this is a new connection
 	if isNew {
-		if err := ch.ExchangeDeclare(r.conf.Exchange, r.conf.ExchangeType, true, false, false, false, nil); err != nil {
+		durable := !r.conf.DisablePersistence
+		if err := ch.ExchangeDeclare(r.conf.Exchange, r.conf.ExchangeType, durable, false, false, false, nil); err != nil {
 			return nil, fmt.Errorf("Failed to declare exchange '%s'! Got: %s", r.conf.Exchange, err)
 		}
 	}
@@ -222,7 +223,8 @@ func (r *Relay) declareQueue(ch *amqp.Channel, name string, routingKey string) e
 	}
 
 	// Declare the queue
-	if _, err := ch.QueueDeclare(name, true, autoDelete, exclusive, false, args); err != nil {
+	durable := !r.conf.DisablePersistence
+	if _, err := ch.QueueDeclare(name, durable, autoDelete, exclusive, false, args); err != nil {
 		return fmt.Errorf("Failed to declare queue '%s'! Got: %s", name, err)
 	}
 
